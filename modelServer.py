@@ -3,16 +3,17 @@ import pika, sys, os, time
 from modelCreator import ModelCreator
 
 class ModelServer:
-    def __init__(self) -> None:
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    def __init__(self, mqHost, rpcQName) -> None:
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=mqHost))
         self.channel = self.connection.channel()
+        self.rpcQName = rpcQName
 
-        self.channel.queue_declare(queue='rpc_queue')
+        self.channel.queue_declare(queue=self.rpcQName)
         self.model_creator = ModelCreator()
 
     def start(self):
         self.channel.basic_qos(prefetch_count=1)
-        self.channel.basic_consume(queue='rpc_queue', on_message_callback=self._callback)
+        self.channel.basic_consume(queue=self.rpcQName, on_message_callback=self._callback)
 
         print(' [*] Waiting for messages. To exit press CTRL+C')
         self.channel.start_consuming()
@@ -33,7 +34,7 @@ class ModelServer:
 
 if __name__ == '__main__':
     try:
-        ms = ModelServer()
+        ms = ModelServer('localhost', 'rpc_queue')
         ms.start()
     except KeyboardInterrupt:
         print('Interrupted')
