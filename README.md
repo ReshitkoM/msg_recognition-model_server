@@ -1,0 +1,1 @@
+run tests: python3 serveTest.py ; python3 -m unittest discover -s ./test
