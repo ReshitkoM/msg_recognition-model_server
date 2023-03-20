@@ -9,10 +9,9 @@ from vosk import Model, KaldiRecognizer, SetLogLevel
 
 class ModelImpl(ModelBase):
 
-    def __init__(self) -> None:
+    def __init__(self, modelName) -> None:
         SetLogLevel(0)
-        self.model = Model(model_name="vosk-model-small-en-us-0.15")
-        # super().__init__()
+        self.model = Model(model_name=modelName)
 
     def _convert_from_ogg(self, oggAudio):
         song = AudioSegment.from_ogg(oggAudio)

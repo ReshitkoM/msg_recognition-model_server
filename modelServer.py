@@ -1,4 +1,4 @@
-import pika, sys, os, time
+import pika, sys, os, time, json, base64
 
 from modelCreator import ModelCreator
 
@@ -19,10 +19,14 @@ class ModelServer:
         self.channel.start_consuming()
 
     def _callback(self, ch, method, properties, body):
+        msg = json.loads(body)
+        # f = open('testRU.ogg', 'wb')
+        # f.write(base64.b64decode(msg["audio"]))
+        # f.close()
         print("start")
         start = time.time()
-        recognizer = self.model_creator.get_model({})
-        res = recognizer.predict(body)
+        recognizer = self.model_creator.get_model({"lang": msg["lang"]})
+        res = recognizer.predict(base64.b64decode(msg["audio"]))
         ch.basic_publish(exchange='',
                      routing_key=properties.reply_to,
                      properties=pika.BasicProperties(correlation_id = \
