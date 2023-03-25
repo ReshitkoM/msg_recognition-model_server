@@ -1,7 +1,10 @@
 __pycache__/*
 test/__pycache__/*
 .idea/*
+
+models/*
 !models/*.py
 
+misc/*
 *.ogg
 *.wav
