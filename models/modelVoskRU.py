@@ -1,5 +1,5 @@
-from .modelImplVosk import ModelImplVosk
 from .modelBase import ModelBase
+from .modelImplVosk import ModelImplVosk
 
 class ModelRU(ModelBase):
     @staticmethod

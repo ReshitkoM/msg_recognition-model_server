@@ -1,4 +1,10 @@
-import pika, sys, os, time, json, base64
+import base64
+import json
+import time
+import os
+import sys
+
+import pika
 
 from modelCreator import ModelCreator
 

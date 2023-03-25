@@ -1,7 +1,9 @@
+import base64
+import json
 import unittest
-import json, base64
-import pika, uuid
-import modelServer
+import uuid
+
+import pika
 
 class TestModelServer(unittest.TestCase):
     def setUp(self) -> None:
