@@ -1,5 +1,3 @@
-from modelBase import ModelBase
-
 import sys
 import io
 
@@ -7,7 +5,7 @@ import wave
 from pydub import AudioSegment
 from vosk import Model, KaldiRecognizer, SetLogLevel
 
-class ModelImpl(ModelBase):
+class ModelImplVosk():
 
     def __init__(self, modelName) -> None:
         SetLogLevel(0)

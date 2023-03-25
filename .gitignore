@@ -1,0 +1,7 @@
+__pycache__/*
+test/__pycache__/*
+.idea/*
+!models/*.py
+
+*.ogg
+*.wav
