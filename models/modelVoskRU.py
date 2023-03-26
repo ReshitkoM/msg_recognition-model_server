@@ -7,7 +7,7 @@ class ModelRU(ModelBase):
         return "RU"
 
     def __init__(self) -> None:
-        self.model = ModelImplVosk(model_name="vosk-model-small-ru-0.22")
+        self.model = ModelImplVosk(modelName="vosk-model-small-ru-0.22")
 
     def predict(self, data):
         return self.model.predict(data)

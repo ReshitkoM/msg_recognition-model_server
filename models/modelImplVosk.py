@@ -1,5 +1,6 @@
-import sys
 import io
+import json
+import sys
 
 import wave
 from pydub import AudioSegment
@@ -30,7 +31,8 @@ class ModelImplVosk():
         return wf
 
     def _postproc(self, rec):
-        return rec.FinalResult()
+        res = json.loads(rec.FinalResult())
+        return res["text"]
 
     def predict(self, oggAudio):
         wav = self._preproc(oggAudio)

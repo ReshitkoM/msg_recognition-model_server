@@ -72,5 +72,22 @@ class TestModelServer(unittest.TestCase):
         self.connection.process_data_events(time_limit=None)
         self.assertEqual(json.loads(self.response)["text"], "привет это тестовое сообщение для моего телеграмм бота на русском языке")
 
+    def testUnknownLang(self):
+        request = {"audio": "", "lang": "UNKNOWN"}
+
+        self.response = None
+        self.corr_id = str(uuid.uuid4())
+        self.channel.basic_publish(
+            exchange='',
+            routing_key='test_rpc_queue',
+            properties=pika.BasicProperties(
+                reply_to=self.callback_queue,
+                correlation_id=self.corr_id,
+            ),
+            body=json.dumps(request))
+        
+        self.connection.process_data_events(time_limit=None)
+        self.assertFalse(json.loads(self.response)["success"])
+
 if __name__ == "__main__":
     unittest.main()

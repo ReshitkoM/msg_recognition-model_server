@@ -14,6 +14,7 @@ class ModelCreator:
             if self.availableModels[i].lang() == lang:
                 self.model = self.availableModels[i]()
                 modelFound = True
+                break
 
         if not modelFound:
             raise Exception("Cannot find suitable model!")

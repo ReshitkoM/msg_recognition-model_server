@@ -31,13 +31,19 @@ class ModelServer:
         # f.close()
         print("start")
         start = time.time()
-        recognizer = self.model_creator.get_model({"lang": msg["lang"]})
-        res = recognizer.predict(base64.b64decode(msg["audio"]))
+        res = {}
+        try:
+            recognizer = self.model_creator.get_model({"lang": msg["lang"]})
+            predText = recognizer.predict(base64.b64decode(msg["audio"]))
+            res = {"success": True, "text": predText}
+        except Exception:
+            res = {"success": False}
+        
         ch.basic_publish(exchange='',
                      routing_key=properties.reply_to,
                      properties=pika.BasicProperties(correlation_id = \
                                                          properties.correlation_id),
-                     body=res)
+                     body=json.dumps(res))
         ch.basic_ack(delivery_tag=method.delivery_tag)
         print("stop")
         print(time.time() - start)
