@@ -1,3 +1,5 @@
+import logging
+
 from models import *
 from models.modelBase import ModelBase
 
@@ -6,10 +8,10 @@ class ModelCreator:
     def __init__(self):
         self.model = None
         self.availableModels = ModelBase.__subclasses__()
+        logging.info('Available models: %s.', self.availableModels)
 
     def _find_model(self, lang) -> ModelBase:
         modelFound = False
-        print(self.availableModels)
         for i in range(0, len(self.availableModels)):
             if self.availableModels[i].lang() == lang:
                 self.model = self.availableModels[i]()
@@ -17,7 +19,7 @@ class ModelCreator:
                 break
 
         if not modelFound:
-            raise Exception("Cannot find suitable model!")
+            raise Exception(f"Cannot find suitable model for language {lang}.")
 
     def get_model(self, params) -> ModelBase:
         if self.model is None or self.model.lang() != params["lang"]:

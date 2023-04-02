@@ -8,3 +8,4 @@ models/*
 misc/*
 *.ogg
 *.wav
+*.log

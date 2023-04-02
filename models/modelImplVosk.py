@@ -1,5 +1,6 @@
 import io
 import json
+import logging
 import sys
 
 import wave
@@ -21,12 +22,8 @@ class ModelImplVosk():
     def _preproc(self, data):
         wavAudio = self._convert_from_ogg(io.BytesIO(data))
         wf = wave.open(wavAudio, "rb")
-        # print(wf.getnchannels())
-        # print(wf.getsampwidth())
-        # print(wf.getcomptype())
         if wf.getnchannels() != 1 or wf.getsampwidth() != 2 or wf.getcomptype() != "NONE":
-            print("Audio file must be WAV format mono PCM.")
-            sys.exit(1) #TODO throw
+            raise Exception(f"Audio file must be WAV format mono PCM. Received channels: {wf.getnchannels()}, samplewidth: {wf.getsampwidth()}, comptype:{wf.getcomptype()}.")
 
         return wf
 
@@ -47,10 +44,8 @@ class ModelImplVosk():
                 break
             if rec.AcceptWaveform(data):
                 pass
-                # print(rec.Result())
             else:
                 pass
-                # print(rec.PartialResult())
             pass
 
         return self._postproc(rec)

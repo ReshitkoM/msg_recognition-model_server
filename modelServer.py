@@ -1,5 +1,6 @@
 import base64
 import json
+import logging
 import time
 import os
 import sys
@@ -10,6 +11,8 @@ from modelCreator import ModelCreator
 
 class ModelServer:
     def __init__(self, mqHost, rpcQName) -> None:
+        logging.basicConfig(filename='example.log', encoding='utf-8', format='%(asctime)s %(levelname)s:%(message)s', level=logging.INFO)
+
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=mqHost))
         self.channel = self.connection.channel()
         self.rpcQName = rpcQName
@@ -20,23 +23,21 @@ class ModelServer:
     def start(self):
         self.channel.basic_qos(prefetch_count=1)
         self.channel.basic_consume(queue=self.rpcQName, on_message_callback=self._callback)
-
-        print(' [*] Waiting for messages. To exit press CTRL+C')
+        logging.info('Model server is waiting for messages.')
         self.channel.start_consuming()
 
     def _callback(self, ch, method, properties, body):
         msg = json.loads(body)
-        # f = open('testRU.ogg', 'wb')
-        # f.write(base64.b64decode(msg["audio"]))
-        # f.close()
-        print("start")
+        logging.info('Received request of size %s bytes, language: %s, id: %s.', sys.getsizeof(base64.b64decode(msg["audio"])), msg["lang"], properties.correlation_id)
         start = time.time()
         res = {}
         try:
             recognizer = self.model_creator.get_model({"lang": msg["lang"]})
             predText = recognizer.predict(base64.b64decode(msg["audio"]))
             res = {"success": True, "text": predText}
-        except Exception:
+        except Exception as ex:
+            message = ex.args
+            logging.error('Failed to process request. id: %s, result: %s, time: %s, message: %s', properties.correlation_id, res, time.time() - start, message)
             res = {"success": False}
         
         ch.basic_publish(exchange='',
@@ -45,8 +46,7 @@ class ModelServer:
                                                          properties.correlation_id),
                      body=json.dumps(res))
         ch.basic_ack(delivery_tag=method.delivery_tag)
-        print("stop")
-        print(time.time() - start)
+        logging.info('Request processed. id: %s, result: %s, time: %s.', properties.correlation_id, res, time.time() - start)
 
 if __name__ == '__main__':
     try:
