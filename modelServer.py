@@ -1,4 +1,6 @@
+import argparse
 import base64
+import configparser
 import json
 import logging
 import time
@@ -10,12 +12,24 @@ import pika
 from modelCreator import ModelCreator
 
 class ModelServer:
-    def __init__(self, mqHost, rpcQName) -> None:
-        logging.basicConfig(filename='example.log', encoding='utf-8', format='%(asctime)s %(levelname)s:%(message)s', level=logging.INFO)
+    def __init__(self) -> None:
+        parser = argparse.ArgumentParser()
+        
+        parser.add_argument('config')
+        args = parser.parse_args()
 
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=mqHost))
+        config = configparser.ConfigParser()
+        config.read(args.config)
+
+        log_level = getattr(logging, config['log']['logLevel'].upper(), None)
+        if not isinstance(log_level, int):
+            raise ValueError('Invalid log level: %s' % config['log']['logLevel'])
+        
+        logging.basicConfig(filename=config['log']['fileName'], encoding='utf-8', format='%(asctime)s %(levelname)s:%(message)s', level=log_level)
+
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=config['mq']['host']))
         self.channel = self.connection.channel()
-        self.rpcQName = rpcQName
+        self.rpcQName = config['mq']['rpcQueue']
 
         self.channel.queue_declare(queue=self.rpcQName)
         self.model_creator = ModelCreator()
@@ -50,7 +64,7 @@ class ModelServer:
 
 if __name__ == '__main__':
     try:
-        ms = ModelServer('localhost', 'rpc_queue')
+        ms = ModelServer()
         ms.start()
     except KeyboardInterrupt:
         print('Interrupted')
