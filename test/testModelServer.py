@@ -39,7 +39,7 @@ class TestModelServer(unittest.TestCase):
             self.response = body
 
     def testPredict(self):
-        request = {"audio": self.__getAudioSample('test/data/test.ogg'), "lang": "EN"}
+        request = {"audio": self.__getAudioSample('test/data/testEN.ogg'), "lang": "EN"}
 
         self.response = None
         self.corr_id = str(uuid.uuid4())
@@ -53,7 +53,7 @@ class TestModelServer(unittest.TestCase):
             body=json.dumps(request))
         
         self.connection.process_data_events(time_limit=None)
-        self.assertEqual(json.loads(self.response)["text"], "hi this is a test message for my first was recognition telegram boat")
+        self.assertEqual(json.loads(self.response)["text"], "hi this is a test message from my text recognition telegram boss")
 
     def testLangs(self):
         request = {"audio": self.__getAudioSample('test/data/testRU.ogg'), "lang": "RU"}
