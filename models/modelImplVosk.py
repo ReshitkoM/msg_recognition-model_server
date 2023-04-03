@@ -1,7 +1,5 @@
 import io
 import json
-import logging
-import sys
 
 import wave
 from pydub import AudioSegment

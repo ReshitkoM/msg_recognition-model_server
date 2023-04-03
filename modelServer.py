@@ -5,6 +5,7 @@ import json
 import logging
 import time
 import os
+import signal
 import sys
 
 import pika
@@ -63,11 +64,12 @@ class ModelServer:
         logging.info('Request processed. id: %s, result: %s, time: %s.', properties.correlation_id, res, time.time() - start)
 
 if __name__ == '__main__':
+    signal.signal(signal.SIGINT, signal.default_int_handler)
     try:
         ms = ModelServer()
         ms.start()
     except KeyboardInterrupt:
-        print('Interrupted')
+        logging.info('Interrupted')
         try:
             sys.exit(0)
         except SystemExit:
