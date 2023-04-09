@@ -27,8 +27,18 @@ class ModelServer:
             raise ValueError('Invalid log level: %s' % config['log']['logLevel'])
         
         logging.basicConfig(filename=config['log']['fileName'], encoding='utf-8', format='%(asctime)s %(levelname)s:%(message)s', level=log_level)
+        for i in range(10):
+            try:
+                self.connection = pika.BlockingConnection(pika.URLParameters("amqp://rmuser:rmpassword@rabbitmq:5672/"))
+                break
+            except pika.exceptions.AMQPConnectionError:
+                if i == 9:
+                    logging.error('Failed to connect to mq.')
+                    raise
 
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=config['mq']['host']))
+                logging.info('Failed to connect to mq. Retrying...')
+                time.sleep(5)
+
         self.channel = self.connection.channel()
         self.rpcQName = config['mq']['rpcQueue']
 
@@ -66,6 +76,7 @@ class ModelServer:
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal.default_int_handler)
     try:
+        mqConnectString = os.environ.get('MQ_CONNECTION_STRING', "amqp://guest:guest@localhost:5672/")
         ms = ModelServer()
         ms.start()
     except KeyboardInterrupt:
