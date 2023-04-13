@@ -16,19 +16,24 @@ for docker see https://github.com/ReshitkoM/msg_recognition-backend
 
 
 example config:
-`[log]
+```
+[log]
 fileName=logFile.log
 logLevel=info
   
 [mq]
 host= localhost
-rpcQueue= rpc_queue`
+rpcQueue= rpc_queue
+```
+
 
 example config_test:
-`[log]
+```
+[log]
 fileName=logFileTest.log
 logLevel=info
   
 [mq]
 host= localhost
-rpcQueue= test_rpc_queue`
+rpcQueue= test_rpc_queue
+```
