@@ -13,7 +13,7 @@ import pika
 from modelCreator import ModelCreator
 
 class ModelServer:
-    def __init__(self) -> None:
+    def __init__(self, mqConnectString) -> None:
         parser = argparse.ArgumentParser()
         
         parser.add_argument('config')
@@ -29,7 +29,7 @@ class ModelServer:
         logging.basicConfig(filename=config['log']['fileName'], encoding='utf-8', format='%(asctime)s %(levelname)s:%(message)s', level=log_level)
         for i in range(10):
             try:
-                self.connection = pika.BlockingConnection(pika.URLParameters("amqp://rmuser:rmpassword@rabbitmq:5672/"))
+                self.connection = pika.BlockingConnection(pika.URLParameters(mqConnectString))
                 break
             except pika.exceptions.AMQPConnectionError:
                 if i == 9:
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal.default_int_handler)
     try:
         mqConnectString = os.environ.get('MQ_CONNECTION_STRING', "amqp://guest:guest@localhost:5672/")
-        ms = ModelServer()
+        ms = ModelServer(mqConnectString)
         ms.start()
     except KeyboardInterrupt:
         logging.info('Interrupted')
